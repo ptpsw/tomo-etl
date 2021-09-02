@@ -1,5 +1,5 @@
 station_id,name,lat,lon,l2_folder,l3_folder
-GI-01,Gili Iyang 1,,,GI_01,st00
-GI-02,Gili Iyang 2,,,GI_02,st01
-GI-03,Gili Iyang 3,,,GI_03,st02
-GI-04,Gili Iyang 4,,,GI_04,st03
+GI-01,Gili Iyang 1,,,GI_01,GI01
+GI-02,Gili Iyang 2,,,GI_02,GI02
+GI-03,Gili Iyang 3,,,GI_03,GI03
+GI-04,Gili Iyang 4,,,GI_04,GI04

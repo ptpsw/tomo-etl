@@ -63,14 +63,45 @@ ON DUPLICATE KEY UPDATE name=VALUES(name), lat=VALUES(lat), lon=VALUES(lon),
     l2_folder=VALUES(l2_folder), l3_folder=VALUES(l3_folder);
 """
 
+station_link_id_insert = """
+INSERT INTO station_links (link_name, source_station_id, dest_station_id)
+VALUES (%s, %s, %s)
+ON DUPLICATE KEY UPDATE 
+    link_name=VALUES(link_name), 
+    source_station_id=VALUES(source_station_id),
+    dest_station_id=VALUES(dest_station_id)
+"""
+
 max_snr_table_insert = """
 INSERT INTO max_snr (station_id, timestamp, value)
 VALUES (%s, %s, %s)
 ON DUPLICATE KEY UPDATE value=VALUES(value);
 """
+
 temp_table_insert = """
+INSERT INTO temperature (station_link_id, timestamp, value)
+VALUES (%s, %s, %s)
+ON DUPLICATE KEY UPDATE station_link_id=station_link_id
 """
+
 current_table_insert = """
+"""
+
+# Select queries
+get_station_id_l2_sql = """
+SELECT station_id FROM stations WHERE l2_folder=%s;
+"""
+
+get_station_id_l3_sql = """
+SELECT station_id FROM stations WHERE l3_folder=%s;
+"""
+
+get_station_link_sql = """
+SELECT link_id, link_name, source_station_id, dest_station_id
+FROM station_links
+WHERE 
+    (source_station_id=%s AND dest_station_id=%s) OR
+    (source_station_id=%s AND dest_station_id=%s);
 """
 
 # Create tables with tables referenced by foreign key first
