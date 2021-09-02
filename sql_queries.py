@@ -11,7 +11,9 @@ CREATE TABLE IF NOT EXISTS stations (
     station_id VARCHAR(10) PRIMARY KEY,
     name VARCHAR(50),
     lat FLOAT,
-    lon FLOAT
+    lon FLOAT,
+    l2_folder VARCHAR(50),
+    l3_folder VARCHAR(50)
 );
 """
 station_link_table_create = """
@@ -55,9 +57,10 @@ CREATE TABLE IF NOT EXISTS current (
 
 # Insert queries
 stations_table_insert = """
-INSERT INTO stations (station_id, name, lat, lon)
-VALUES (%s, %s, %s, %s) 
-ON DUPLICATE KEY UPDATE name=VALUES(name), lat=VALUES(lat), lon=VALUES(lon);
+INSERT INTO stations (station_id, name, lat, lon, l2_folder, l3_folder)
+VALUES (%s, %s, %s, %s, %s, %s) 
+ON DUPLICATE KEY UPDATE name=VALUES(name), lat=VALUES(lat), lon=VALUES(lon),
+    l2_folder=VALUES(l2_folder), l3_folder=VALUES(l3_folder);
 """
 
 max_snr_table_insert = """
