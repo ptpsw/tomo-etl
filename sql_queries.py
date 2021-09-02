@@ -85,6 +85,9 @@ ON DUPLICATE KEY UPDATE station_link_id=station_link_id
 """
 
 current_table_insert = """
+INSERT INTO current (station_link_id, timestamp, value, direction)
+VALUES (%s, %s, %s, %s)
+ON DUPLICATE KEY UPDATE station_link_id=station_link_id
 """
 
 # Select queries
