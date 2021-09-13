@@ -5,12 +5,19 @@ import requests
 from watchdog.observers import Observer
 from watchdog.events import PatternMatchingEventHandler
 from dotenv import load_dotenv
+from etl import *
 
 load_dotenv()
-
 class PatternEvent(PatternMatchingEventHandler):
     def on_created(self, event):
-        notify_telegram(event)
+        try:
+            process_file(event.src_path)
+            msg = f'Successfully processed {event.src_path}'
+        except Exception as e:
+            msg = f'ETL Job failed for {event.src_path}: {repr(e)}'
+        finally:
+            notify_telegram(msg)
+
 
 def notify_telegram(msg):
     url = f'https://api.telegram.org/bot{os.getenv("TELEGRAM_BOT_TOKEN")}/sendMessage'
