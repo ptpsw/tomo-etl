@@ -37,6 +37,13 @@ def day_decimal_to_timestamp(datetime, day_decimal_ser):
     timestamp_ser = pd.to_datetime(datetime.date()).value + day_decimal_ser%1*86400*1e9
     return pd.to_datetime(timestamp_ser, format='%Y-%m-%d %H:%M:%S')
 
+def parse_date_by_os(str, format):
+    if sys.platform == "win32":
+        std_date = datetime.strptime(str, format.replace(':', '_'))
+    else:
+        std_date = datetime.strptime(str, format)
+    return std_date
+
 def process_sdr_file(conn, cur, filepath):
     raise NotImplementedError
 
@@ -52,8 +59,8 @@ def process_sde_file(conn, cur, filepath):
 
     if(m.group("date_start") is None):
         raise ValueError("Can't get SDE product date")
-
-    std_date = datetime.strptime(m.group("date_start"), '%y%m%d_%H_%M_%S')
+        
+    std_date = parse_date_by_os(m.group("date_start"), '%y%m%d_%H:%M:%S')
     std_folder = get_std_station_folder(filepath)
 
     result = cur.execute(get_station_id_l2_sql, (std_folder))
