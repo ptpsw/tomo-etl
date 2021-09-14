@@ -45,7 +45,33 @@ def parse_date_by_os(str, format):
     return std_date
 
 def process_sdr_file(conn, cur, filepath):
-    raise NotImplementedError
+    head, tail = os.path.split(filepath)
+
+    # eg: "0210906_01:00:26to0210906_00:50:25_SDR.csv"
+    regex_date = '(?P<{}>[0-9]{{6}}_[0-9]{{2}}(:|_)[0-9]{{2}}(:|_)[0-9]{{2}})?'
+    regex_sdr = re.compile('(?P<st1>[0-9])?' + regex_date.format("date_start") + 'to' +
+                       '(?P<st2>[0-9])?' + regex_date.format("date_end") + '_SDR.csv')
+    m = regex_sdr.match(tail)
+
+    if(m.group("date_start") is None):
+        raise ValueError("Can't get SDR product date")
+        
+    sdr_date = parse_date_by_os(m.group("date_start"), '%y%m%d_%H:%M:%S')
+    sdr_folder = get_std_station_folder(filepath)
+
+    result = cur.execute(get_station_id_l2_sql, (sdr_folder))
+    if (result == 0):
+        raise ValueError("Cannot get station_id from station folder:{}".format(sdr_folder))
+    sdr_station, = cur.fetchone()
+
+    sdr_data_df = pd.read_csv(filepath, sep=' ')
+    sdr_data_df['date'] = str(sdr_date.date())
+    sdr_data_df['timestamp'] = pd.to_datetime(sdr_data_df['date'] + ' ' + sdr_data_df['Time_day'])
+    sdr_data_df['station'] = sdr_station
+
+    for index, row in sdr_data_df[['station', 'timestamp', 'Max_SNR']].iterrows():
+        cur.execute(sdr_table_insert, list(row))
+        conn.commit()
 
 def process_sde_file(conn, cur, filepath):
     head, tail = os.path.split(filepath)
